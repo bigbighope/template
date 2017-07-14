@@ -484,12 +484,22 @@
 				"defaultValue": {
 					"provider": "1C8BE09A-CE46-4BF1-A01B-F570FE1EA1B3"
 				}
+			},
+			"recoveryServiceVaultName": {
+				"type": "string",
+				"defaultValue": "WendeRecoverServiceVault",	
+				"metadata": {
+					"description": "Name of the Recovery Service Vault"
+				}
 			}
 		},
 		"variables": {
 			"apiVersions": {
 				"resources": {
 					"deployments": "2016-09-01"
+				},
+				"recoveryServices": {
+					"vaults": "2016-06-01"
 				},
 				"storage": {
 					"storageAccounts": "2016-12-01"
@@ -717,6 +727,25 @@
 			"diskCaching": "[variables(concat('diskCaching_',parameters('clusterVMStorageSize')))]"
 		},
 		"resources": [
+			{
+				"apiVersion": "[variables('apiVersions').recoveryServices.vaults]",
+				"type": "Microsoft.RecoveryServices/vaults",
+				"name": "[parameters('recoveryServiceVaultName')]",
+				"dependsOn": [
+					"[variables('vnet')]",
+					"[variables('dsu')]",
+					"[variables('database')]"
+				],
+				"location": "[parameters('location')]",
+				"tags": {
+					"provider": "[toUpper(parameters('teradataTags').provider)]"
+				},
+				"sku": {
+					"name": "RS0",
+					"tier": "Standard"
+				},
+				"properties": {}
+			},
 			{
 				"apiVersion": "[variables('apiVersions').storage.storageAccounts]",
 				"type": "Microsoft.Storage/storageAccounts",
