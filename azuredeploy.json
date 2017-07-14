@@ -1,0 +1,1473 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"artifactsBaseUrl": {
+			"type": "string",
+				"defaultValue": "https://testteraseattle1.blob.core.windows.net/ga-external/",
+				"metadata": {
+					"description": "Base URL of the solution template gallery package not including the trailing slash",
+					"artifactsBaseUrl": ""
+				}
+			},
+			"location": {
+				"type": "string",
+				"metadata": {
+					"description": "Location were resources will be deployed"
+				}
+			},
+			"adminUsername": {
+				"type": "string",
+				"metadata": {
+					"description": "Username for administrator of virtual machines and SSH"
+				}
+			},
+			"authenticationType": {
+				"type": "string",
+				"allowedValues": [
+					"password",
+					"sshPublicKey"
+				],
+				"metadata": {
+					"description": "Authentication type for the virtual machines"
+				}
+			},
+			"adminPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Admin password for the virtual machines and SSH. Keep empty if providing SSH Public Key authentication type."
+				}
+			},
+			"sshPublicKey": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "SSH public key that will be included on all nodes in the cluster. The OpenSSH public key can be generated with tools like ssh-keygen on Linux or OS X."
+				}
+			},
+			"vmNamePrefixDatabase": {
+				"type": "string",
+				"metadata": {
+					"description": "Prefix that will be used for the Database VMs consisting of 2-10 lowercase letter and numbers"
+				}
+			},
+			"dbsPassword": {
+				"type": "securestring",
+				"metadata": {
+					"description": "Database password used for DBS system"
+				}
+			},
+			"vmCountDatabase": {
+				"type": "int",
+				"metadata": {
+					"description": "Number of the VMs in DBS System"
+				}
+			},
+			"clusterVmSizeDataBase": {
+				"type": "string",
+				"metadata": {
+					"description": "Size of the Database VMs"
+				}
+			},
+			"tdcTimeZone": {
+				"type": "string",
+				"metadata": {
+					"description": "Time zone for TDC Network"
+				}
+			},
+			"ntpServerlist": {
+				"type": "string",
+				"metadata": {
+					"description": "NTPservers for all applications"
+				}
+			},
+			"vnetResourceGroup": {
+				"type": "string",
+				"metadata": {
+					"description": "Virtual Network Resource Group for cases when cluster nodes are deployed into an existing VNet"
+				}
+			},
+			"vnetName": {
+				"type": "string",
+				"metadata": {
+					"description": "Virtual Network name"
+				}
+			},
+			"vnetNewOrExisting": {
+				"type": "string",
+				"allowedValues": [
+					"new",
+					"existing"
+				],
+				"metadata": {
+					"description": "Parameter that specifies if an new or an existing virtual network should be used for deploying cluster nodes"
+				}
+			},
+			"vnetAddressSpace": {
+				"type": "string",
+				"defaultValue": "10.1.0.0/16",
+				"metadata": {
+					"description": "Virtual Network Address Prefix (i.e. CIDR)"
+				}
+			},
+			"vmSubnetName": {
+				"type": "string",
+				"metadata": {
+					"description": "VM Subnet"
+				}
+			},
+			"vmSubnetAddressSpace": {
+				"type": "string",
+				"metadata": {
+					"description": "VM Subnet Address Space"
+				}
+			},
+			"vmSubnetStartAddress": {
+				"type": "string",
+				"metadata": {
+					"description": "VMSubnet Start Address"
+				}
+			},
+			"bynet0SubnetName": {
+				"type": "string",
+				"metadata": {
+					"description": "Bynet0 Subnet Name"
+				}
+			},
+			"bynet0SubnetAddressSpace": {
+				"type": "string",
+				"metadata": {
+					"description": "Bynet0 Subnet Address Space"
+				}
+			},
+			"bynet0SubnetStartAddress": {
+				"type": "string",
+				"metadata": {
+					"description": "Bynet0 Subnet Start Address"
+				}
+			},
+			"bynet1SubnetName": {
+				"type": "string",
+				"metadata": {
+					"description": "bynet1 Subnet Name"
+				}
+			},
+			"bynet1SubnetAddressSpace": {
+				"type": "string",
+				"metadata": {
+					"description": "Bynet1 Subnet Address Space"
+				}
+			},
+			"bynet1SubnetStartAddress": {
+				"type": "string",
+				"metadata": {
+					"description": "Bynet1Subnet Start Address"
+				}
+			},
+			"publicIPAddressSingleOrMultiple": {
+				"type": "string",
+				"defaultValue": "No",
+				"metadata": {
+					"description": "Parameter that specifies if an single or multiple public IP's should be used for deployment"
+				}
+			},
+			"japaneseSupport": {
+				"type": "string",
+				"metadata": {
+					"description": "Japanese Support"
+				}
+			},
+			"clusterVMStorageSize": {
+				"type": "string",
+				"defaultValue": "0TB",
+				"metadata": {
+					"description": "SKU size of cluster virtual machine"
+				}
+			},
+			"dmPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Password for administrator datamover"
+				}
+			},
+			"dmSshPublicKey": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "SSH public key for datamover"
+				}
+			},
+			"dmAuthenticationType": {
+				"type": "string",
+				"defaultValue": "password",
+				"metadata": {
+					"description": "Authentication type for the datamover virtual machines"
+				}
+			},
+			"dmDBCPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Data mover dbc password"
+				}
+			},
+			"dmIntPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Data mover dbc password"
+				}
+			},
+			"dmSystemPrefix": {
+				"type": "string",
+				"defaultValue": "datamover",
+				"metadata": {
+					"description": "Datamover system prefix"
+				}
+			},
+			"dmAgentNodeCount": {
+				"type": "int",
+				"defaultValue": 0,
+				"metadata": {
+					"description": "Number of Additional Data Mover Agents(Min:0 Max: 3)"
+				}
+			},
+			"dmClusterVmSize": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Data mover cluster VM size"
+				}
+			},
+			"dmYesOrNo": {
+				"type": "string",
+				"defaultValue": "No",
+				"metadata": {
+					"description": "Weather to deploy datamover yes or no"
+				}
+			},
+			"smPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Password for administrator SM"
+				}
+			},
+			"smSshPublicKey": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "SSH public key for SM"
+				}
+			},
+			"smAuthenticationType": {
+				"type": "string",
+				"defaultValue": "password",
+				"metadata": {
+					"description": "Authentication type for the SM virtual machines"
+				}
+			},
+			"smSiteID": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Site ID"
+				}
+			},
+			"smAdminPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Server Management Admin password"
+				}
+			},
+			"smRESTPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Server Management REST password"
+				}
+			},
+			"smClusterVmSize": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Server management cluster VM size"
+				}
+			},
+			"smYesOrNo": {
+				"type": "string",
+				"defaultValue": "No",
+				"metadata": {
+					"description": "Weather to deploy server management yes or no"
+				}
+			},
+			"vpPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Password for administrator viewpoint"
+				}
+			},
+			"vpSshPublicKey": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "SSH public key for viewpoint"
+				}
+			},
+			"vpAuthenticationType": {
+				"type": "string",
+				"defaultValue": "password",
+				"metadata": {
+					"description": "Authentication type for the viewpoint virtual machines"
+				}
+			},
+			"vpSystemNamePrefix": {
+				"type": "string",
+				"defaultValue": "viewpoint",
+				"metadata": {
+					"description": "Viewpoint system prefix"
+				}
+			},
+			"vpVmSize": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Viewpoint VM size"
+				}
+			},
+			"vpYesOrNo": {
+				"type": "string",
+				"defaultValue": "No",
+				"metadata": {
+					"description": "Weather to deploy viewpoint yes or no"
+				}
+			},
+			"vpportalpassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "portal admin user password"
+				}
+			},
+			"vpSystemNickName": {
+				"type": "string",
+				"defaultValue": "database",
+				"metadata": {
+					"description": "Name for monitored system in Viewpoint"
+				}
+			},
+			"vpSku": {
+				"type": "string",
+				"defaultValue": "teradata-viewpoint-single-system-hourly",
+				"metadata": {
+					"description": "vp image sku"
+				}
+			},
+			"emPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Password for administrator ecosystem manager"
+				}
+			},
+			"emSshPublicKey": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "SSH public key for ecosystem manager"
+				}
+			},
+			"emAuthenticationType": {
+				"type": "string",
+				"defaultValue": "password",
+				"metadata": {
+					"description": "Authentication type for the ecosystem manager virtual machines"
+				}
+			},
+			"emSystemNamePrefix": {
+				"type": "string",
+				"defaultValue": "ecosysmngr",
+				"metadata": {
+					"description": "ecosystem manager system prefix"
+				}
+			},
+			"emVmSize": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "ecosystem manager VM size"
+				}
+			},
+			"emYesOrNo": {
+				"type": "string",
+				"defaultValue": "No",
+				"metadata": {
+					"description": "Weather to deploy ecosystem manager yes or no"
+				}
+			},
+			"dsuPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "Password for administrator DSU"
+				}
+			},
+			"dsuSshPublicKey": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "SSH public key for DSU"
+				}
+			},
+			"dsuAuthenticationType": {
+				"type": "string",
+				"defaultValue": "password",
+				"metadata": {
+					"description": "Authentication type for the DSU virtual machines"
+				}
+			},
+			"dsuDBCPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "DSU dbc password"
+				}
+			},
+			"dsuIntPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "DSU dbc password"
+				}
+			},
+			"dsuadminPassword": {
+				"type": "securestring",
+				"defaultValue": "",
+				"metadata": {
+					"description": "DSU int dbc password"
+				}
+			},
+			"dsuSystemPrefix": {
+				"type": "string",
+				"defaultValue": "dsc",
+				"metadata": {
+					"description": "dsu system prefix"
+				}
+			},
+			"dsuAgentNodeCount": {
+				"type": "int",
+				"defaultValue": 1,
+				"metadata": {
+					"description": "Number of Additional DSU Agents(Min:0 Max: 3)"
+				}
+			},
+			"dsuClusterVmSize": {
+				"type": "string",
+				"defaultValue": "",
+				"metadata": {
+					"description": "DSU VM size"
+				}
+			},
+			"dsuYesOrNo": {
+				"type": "string",
+				"defaultValue": "No",
+				"metadata": {
+					"description": "Weather to deploy dsu yes or no"
+				}
+			},
+			"teradataTags": {
+				"type": "object",
+				"defaultValue": {
+					"provider": "1C8BE09A-CE46-4BF1-A01B-F570FE1EA1B3"
+				}
+			}
+		},
+		"variables": {
+			"apiVersions": {
+				"resources": {
+					"deployments": "2016-09-01"
+				},
+				"storage": {
+					"storageAccounts": "2016-12-01"
+				},
+				"network": {
+					"virtualNetworks": "2016-03-30",
+					"networkInterfaces": "2016-03-30",
+					"loadBalancers": "2016-03-30",
+					"publicIPAddresses": "2016-03-30",
+					"networkSecurityGroups": "2016-03-30"
+				},
+				"compute": {
+					"availabilitySets": "2016-03-30",
+					"virtualMachines": "2016-03-30",
+					"virtualMachineExtensions": "2016-03-30"
+				}
+			},
+			"baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
+			"defaultTemplateUrl_Standard_D4_v2_0TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'.json')]",
+			"defaultTemplateUrl_Standard_G5_0TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'.json')]",
+			"defaultTemplateUrl_Standard_G3_0TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'.json')]",
+			"defaultTemplateUrl_Standard_GS5_5TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'.json')]",
+			"defaultTemplateUrl_Standard_GS5_20TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'_20TB.json')]",
+			"defaultTemplateUrl_Standard_DS13_v2_5TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'_5TB.json')]",
+			"defaultTemplateUrl_Standard_DS13_v2_15TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'_15TB.json')]",
+			"defaultTemplateUrl_Standard_DS14_v2_5TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'_5TB.json')]",
+			"defaultTemplateUrl_Standard_DS14_v2_20TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'_20TB.json')]",
+			"defaultTemplateUrl_Standard_DS15_v2_5TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'_5TB.json')]",
+			"defaultTemplateUrl_Standard_DS15_v2_20TB": "[concat(variables('baseUrl'),'database-',parameters('clusterVmSizeDataBase'),'_20TB.json')]",
+			"templateUrlDataBase": "[variables(concat('defaultTemplateUrl_',parameters('clusterVmSizeDataBase'),'_',parameters('clusterVMStorageSize')))]",
+			"defaultPublicIP_No_1": "[concat(variables('baseUrl'),'publicIP-no.json')]",
+			"defaultPublicIP_No_0": "[concat(variables('baseUrl'),'publicIP-no.json')]",
+			"defaultPublicIP_Single_1": "[concat(variables('baseUrl'),'publicIP-single.json')]",
+			"defaultPublicIP_Multiple_1": "[concat(variables('baseUrl'),'publicIP-multiple.json')]",
+			"defaultPublicIP_Single_0": "[concat(variables('baseUrl'),'publicIP-multiple.json')]",
+			"defaultPublicIP_Multiple_0": "[concat(variables('baseUrl'),'publicIP-multiple.json')]",
+			"templateUrlPublicIP": "[variables(concat('defaultPublicIP_',parameters('publicIPAddressSingleOrMultiple'),'_',mod(1,parameters('vmCountDatabase'))))]",
+			"templateUrlVnet": "[concat(variables('baseUrl'),'vnet-',parameters('vnetNewOrExisting'),'.json')]",
+			"templateUrlViewpoint": "[concat(variables('baseUrl'),'viewpoint-',parameters('vpYesOrNo'),'.json')]",
+			"templateUrlEcosystemmanager": "[concat(variables('baseUrl'),'Ecosystemmanager-',parameters('emYesOrNo'),'.json')]",
+			"defaultDatamoverUrl_0": "[concat(variables('baseUrl'),'datamoverM-',parameters('dmYesOrNo'),'.json')]",
+			"defaultDatamoverUrl_1": "[concat(variables('baseUrl'),'datamoverMA-',parameters('dmYesOrNo'),'.json')]",
+			"defaultDatamoverUrl_2": "[concat(variables('baseUrl'),'datamoverMA-',parameters('dmYesOrNo'),'.json')]",
+			"defaultDatamoverUrl_3": "[concat(variables('baseUrl'),'datamoverMA-',parameters('dmYesOrNo'),'.json')]",
+			"templateUrlDatamover": "[variables(concat('defaultDatamoverUrl_',parameters('dmAgentNodeCount')))]",
+			"templateUrlDsu": "[concat(variables('baseUrl'),'dsu-',parameters('dsuYesOrNo'),'.json')]",
+			"templateUrlServerManagement": "[concat(variables('baseUrl'),'serverManagement-',parameters('smYesOrNo'),'.json')]",
+			"defaultScriptUrlInit_Standard_D4_v2": "[concat(variables('baseUrl'),'mpp_configuration.sh')]",
+			"defaultScriptUrlInit_Standard_G3": "[concat(variables('baseUrl'),'mpp_configuration_ls1.sh')]",
+			"defaultScriptUrlInit_Standard_G5": "[concat(variables('baseUrl'),'mpp_configuration_ls1.sh')]",
+			"defaultScriptUrlInit_Standard_GS5": "[concat(variables('baseUrl'),'mpp_configuration.sh')]",
+			"defaultScriptUrlInit_Standard_DS13_v2": "[concat(variables('baseUrl'),'mpp_configuration.sh')]",
+			"defaultScriptUrlInit_Standard_DS14_v2": "[concat(variables('baseUrl'),'mpp_configuration.sh')]",
+			"defaultScriptUrlInit_Standard_DS15_v2": "[concat(variables('baseUrl'),'mpp_configuration.sh')]",
+			"scriptUrlInit": "[variables(concat('defaultScriptUrlInit_',parameters('clusterVmSizeDataBase')))]",
+			"scriptHostUrlvp": "[concat(variables('baseUrl'),'generate_ansible_req.py')]",
+			"vm": "[concat(parameters('vmNamePrefixDatabase'),'-','vm')]",
+			"defaultStorageType_Standard_D4_v2": "Standard_LRS",
+			"defaultStorageType_Standard_G3": "Standard_LRS",
+			"defaultStorageType_Standard_G5": "Standard_LRS",
+			"defaultStorageType_Standard_GS5": "Premium_LRS",
+			"defaultStorageType_Standard_DS13_v2": "Premium_LRS",
+			"defaultStorageType_Standard_DS14_v2": "Premium_LRS",
+			"defaultStorageType_Standard_DS15_v2": "Premium_LRS",
+			"defaultdataDisk_Standard_D4_v2_0TB": 256,
+			"defaultdataDisk_Standard_G3_0TB": 256,
+			"defaultdataDisk_Standard_G5_0TB": 256,
+			"defaultdataDisk_Standard_GS5_5TB": 1023,
+			"defaultdataDisk_Standard_GS5_20TB": 1023,
+			"defaultdataDisk_Standard_DS13_v2_5TB": 1023,
+			"defaultdataDisk_Standard_DS13_v2_15TB": 1023,
+			"defaultdataDisk_Standard_DS14_v2_5TB": 1023,
+			"defaultdataDisk_Standard_DS14_v2_20TB": 1023,
+			"defaultdataDisk_Standard_DS15_v2_5TB": 1023,
+			"defaultdataDisk_Standard_DS15_v2_20TB": 1023,
+			"datadiskSize": "[variables(concat('defaultdataDisk_',parameters('clusterVmSizeDataBase'),'_',parameters('clusterVMStorageSize')))]",
+			"storageCount": "[add(div(parameters('vmCountDatabase'),4),1)]",
+			"tempCount_Standard_GS5_5TB": "[variables('storageCount')]",
+			"tempCount_Standard_GS5_20TB": "[parameters('vmCountDatabase')]",
+			"tempCount_Standard_D4_v2_0TB": "[variables('storageCount')]",
+			"tempCount_Standard_G3_0TB": "[variables('storageCount')]",
+			"tempCount_Standard_G5_0TB": "[variables('storageCount')]",
+			"tempCount_Standard_DS13_v2_5TB": "[variables('storageCount')]",
+			"tempCount_Standard_DS13_v2_15TB": "[parameters('vmCountDatabase')]",
+			"tempCount_Standard_DS14_v2_5TB": "[variables('storageCount')]",
+			"tempCount_Standard_DS14_v2_20TB": "[parameters('vmCountDatabase')]",
+			"tempCount_Standard_DS15_v2_5TB": "[variables('storageCount')]",
+			"tempCount_Standard_DS15_v2_20TB": "[parameters('vmCountDatabase')]",
+			"dataStorageAccountCount": "[variables(concat('tempCount_',parameters('clusterVmSizeDataBase'),'_',parameters('clusterVMStorageSize')))]",
+			"osStorageAccountCount": "[variables('dataStorageAccountCount')]",
+			"defaultskuType_Standard_D4_v2_0TB": "Standard_D4_V2-HDD-512GB",
+			"defaultskuType_Standard_G3_0TB": "Standard_G3-LOCAL-SSD-1.5TB",
+			"defaultskuType_Standard_G5_0TB": "Standard_G5-LOCAL-SSD-6TB",
+			"defaultskuType_Standard_GS5_5TB": "Standard_GS5-SSD-5TB",
+			"defaultskuType_Standard_GS5_20TB": "Standard_GS5-SSD-20TB",
+			"defaultskuType_Standard_DS13_v2_5TB": "Standard_DS13_V2-SSD-5TB-10A",
+			"defaultskuType_Standard_DS13_v2_15TB": "Standard_DS13_V2-SSD-15TB",
+			"defaultskuType_Standard_DS14_v2_5TB": "Standard_DS14_V2-SSD-5TB",
+			"defaultskuType_Standard_DS14_v2_20TB": "Standard_DS14_V2-SSD-20TB",
+			"defaultskuType_Standard_DS15_v2_5TB": "Standard_DS15_V2-SSD-5TB",
+			"defaultskuType_Standard_DS15_v2_20TB": "Standard_DS15_V2-SSD-20TB",
+			"skuTypeValue": "[variables(concat('defaultskuType_',parameters('clusterVmSizeDataBase'),'_',parameters('clusterVMStorageSize')))]",
+			"sharedStorageAccountType": "[variables(concat('defaultStorageType_',parameters('clusterVmSizeDataBase')))]",
+			"diagnosticsStorageAccount": "[concat('d',uniqueString(resourceGroup().id,'d'))]",
+			"publicIPAddressName": "[concat(parameters('vmNamePrefixDatabase'),'-','publicip')]",
+			"publicIPAddressDomainNameLabel": "[concat(parameters('vmNamePrefixDatabase'),'-',uniqueString(resourceGroup().id))]",
+			"defaultPublicIPType_No": "Static",
+			"defaultPublicIPType_single": "Static",
+			"defaultPublicIPType_multiple": "Static",
+			"publicIPAddressType": "[variables(concat('defaultPublicIPType_',parameters('publicIPAddressSingleOrMultiple')))]",
+			"vnetID": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+			"subnet1ID": "[concat(variables('vnetID'),'/subnets/',parameters('vmSubnetName'))]",
+			"subnet2ID": "[concat(variables('vnetID'),'/subnets/',parameters('bynet0SubnetName'))]",
+			"subnet3ID": "[concat(variables('vnetID'),'/subnets/',parameters('bynet1SubnetName'))]",
+			"nic1": "[concat(parameters('vmNamePrefixDatabase'),'-','nic1')]",
+			"nic2": "[concat(parameters('vmNamePrefixDatabase'),'-','nic2')]",
+			"nic3": "[concat(parameters('vmNamePrefixDatabase'),'-','nic3')]",
+			"nsgName": "[concat(parameters('vmNamePrefixDatabase'),'-NSG')]",
+			"defaultJapanese_Yes": "yes",
+			"defaultJapanese_No": "no",
+			"kanjiSupport": "[variables(concat('defaultJapanese_', parameters('japaneseSupport')))]",
+			"defaultOSStorageType_Standard_D4_v2": "Standard_LRS",
+			"defaultOSStorageType_Standard_G3": "Standard_LRS",
+			"defaultOSStorageType_Standard_G5": "Standard_LRS",
+			"defaultOSStorageType_Standard_GS5": "Premium_LRS",
+			"defaultOSStorageType_Standard_DS13_v2": "Premium_LRS",
+			"defaultOSStorageType_Standard_DS14_v2": "Premium_LRS",
+			"defaultOSStorageType_Standard_DS15_v2": "Premium_LRS",
+			"imageStorageAccountType": "[variables(concat('defaultOSStorageType_',parameters('clusterVmSizeDataBase')))]",
+			"imagePublisher": "teradata",
+			"imageOffer": "tdinternal-database-enterprise-preview",
+			"imageSku": "tdinternal-database-enterprise",
+			"imagePublisherDM": "teradata",
+			"imageOfferDM": "tdinternal-data-mover-vm-preview",
+			"imageSkuDM": "tdinternal-data-mover-vm",
+			"imageOfferAgent": "tdinternal-data-mover-agent-preview",
+			"imageSkuAgent": "tdinternal-data-mover-agent",
+			"imagePublisherSM": "teradata",
+			"imageOfferSM": "teradata-server-management",
+			"imageSkuSM": "teradata-server-management",
+			"imagePublisherVP": "teradata",
+			"imageOfferVP": "tdinternal-viewpoint-preview",
+			"imageSkuVP": "[parameters('vpSku')]",
+			"imagePublisherEM": "teradata",
+			"imageOfferEM": "teradata-ecosystem-manager",
+			"imageSkuEM": "teradata-ecosystem-manager",
+			"imagePublisherDSU": "teradata",
+			"imageOfferDSU": "teradata-data-stream-controller",
+			"imageSkuDSU": "teradata-data-stream-controller",
+			"smVMSize": "Standard_DS3_V2",
+			"smImageStorageAccountType": "Premium_LRS",
+			"smSharedStorageAccountType": "Premium_LRS",
+			"dmImageStorageAccountType": "Premium_LRS",
+			"dmSharedStorageAccountType": "Premium_LRS",
+			"vpImageStorageAccountType": "Premium_LRS",
+			"vpharedStorageAccountType": "Premium_LRS",
+			"emImageStorageAccountType": "Premium_LRS",
+			"emharedStorageAccountType": "Premium_LRS",
+			"dsuImageStorageAccountType": "Premium_LRS",
+			"dsuSharedStorageAccountType": "Premium_LRS",
+			"smSystemCount_Yes": 1,
+			"smSystemCount_No": 0,
+			"smSystemCount": "[variables(concat('smSystemCount_',parameters('smYesOrNo')))]",
+			"vpNodeCount_Yes": 1,
+			"vpNodeCount_No": 0,
+			"vpNodeCount": "[variables(concat('vpNodeCount_',parameters('vpYesOrNo')))]",
+			"emNodeCount_Yes": 1,
+			"emNodeCount_No": 0,
+			"emNodeCount": "[variables(concat('emNodeCount_',parameters('emYesOrNo')))]",
+			"dmMasterCount": 1,
+			"dmSystemCount_Yes": "[add(1,parameters('dmAgentNodeCount'))]",
+			"dmSystemCount_No": 0,
+			"dmSystemCount": "[variables(concat('dmSystemCount_',parameters('dmYesOrNo')))]",
+			"dsuNodeCount_Yes": 1,
+			"dsuNodeCount_No": 0,
+			"dsuNodeCount": "[variables(concat('dsuNodeCount_',parameters('dsuYesOrNo')))]",
+			"smSystemPrefix": "sm",
+			"s1": "[split(parameters('vmSubnetStartAddress'),'.')]",
+			"viewpointAddressCount": "[parameters('vmCountDatabase')]",
+			"serverManagementAddressCount": "[add(parameters('vmCountDatabase'),variables('vpNodeCount'))]",
+			"dsuAddressCount": "[add(parameters('vmCountDatabase'),add(variables('vpNodeCount'),variables('smSystemCount')))]",
+			"emAddressCount": "[add(parameters('vmCountDatabase'),add(variables('vpNodeCount'),add(variables('smSystemCount'),variables('dsuNodeCount'))))]",
+			"datamoverAddressCount": "[add(parameters('vmCountDatabase'),add(variables('vpNodeCount'),add(variables('smSystemCount'),add(variables('dsuNodeCount'),variables('emNodeCount')))))]",
+			"dmSubnetStartAddress": "[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),variables('datamoverAddressCount')),256)), '.', mod(add(int(variables('s1')[3]),variables('datamoverAddressCount')),256))]",
+			"dmagentSubnetStartAddress": "[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),variables('datamoverAddressCount')),256)), '.', mod(add(int(variables('s1')[3]),add(1,variables('datamoverAddressCount'))),256))]",
+			"smSubnetStartAddress": "[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),variables('serverManagementAddressCount')),256)), '.', mod(add(int(variables('s1')[3]),variables('serverManagementAddressCount')),256))]",
+			"vpSubnetStartAddress": "[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),variables('viewpointAddressCount')),256)), '.', mod(add(int(variables('s1')[3]),variables('viewpointAddressCount')),256))]",
+			"dsuSubnetStartAddress": "[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),variables('viewpointAddressCount')),256)), '.', mod(add(int(variables('s1')[3]),variables('dsuAddressCount')),256))]",
+			"emSubnetStartAddress": "[concat(variables('s1')[0], '.', variables('s1')[1], '.', add(int(variables('s1')[2]), div(add(int(variables('s1')[3]),variables('viewpointAddressCount')),256)), '.', mod(add(int(variables('s1')[3]),variables('emAddressCount')),256))]",
+			"vpHostFileParam_Yes": "[concat(' --vp ',parameters('vpSystemNamePrefix'),',',variables('vpNodeCount'),',',variables('vpSubnetStartAddress'))]",
+			"vpHostFileParam_No": "",
+			"dmHostFileParamM": "[concat(' --dm_master ',parameters('dmSystemPrefix'),'DMMasterAgent',',',variables('dmMasterCount'),',',variables('dmSubnetStartAddress'))]",
+			"dmHostFileParamA": "[concat(' --dm_agent ',parameters('dmSystemPrefix'),'DMAgent',',',parameters('dmAgentNodeCount'),',',variables('dmagentSubnetStartAddress'))]",
+			"dmHostFileParam_0": "[variables('dmHostFileParamM')]",
+			"dmHostFileParam_1": "[concat(variables('dmHostFileParamM'),variables('dmHostFileParamA'))]",
+			"dmHostFileParam_2": "[concat(variables('dmHostFileParamM'),variables('dmHostFileParamA'))]",
+			"dmHostFileParam_3": "[concat(variables('dmHostFileParamM'),variables('dmHostFileParamA'))]",
+			"dmHostFileParam_No": "",
+			"dmHostFileParam_Yes": "[variables(concat('dmHostFileParam_',parameters('dmAgentNodeCount')))]",
+			"smHostFileParam_Yes": "[concat(' --cmic ',variables('smSystemPrefix'),',',variables('smSystemCount'),',',variables('smSubnetStartAddress'))]",
+			"smHostFileParam_No": "",
+			"emHostFileParam_Yes": "[concat(' --em ',parameters('emSystemNamePrefix'),',',variables('emNodeCount'),',',variables('emSubnetStartAddress'))]",
+			"emHostFileParam_No": "",
+			"dsuHostFileParam_Yes": "[concat(' --dsu ',parameters('dsuSystemPrefix'),',',variables('dsuNodeCount'),',',variables('dsuSubnetStartAddress'))]",
+			"dsuHostFileParam_No": "",
+			"generateHostFileParam": "[concat('--tpa ',parameters('vmNamePrefixDatabase'),',',parameters('vmCountDatabase'),',',parameters('vmSubnetStartAddress'),variables(concat('vpHostFileParam_',parameters('vpYesOrNo'))),variables(concat('emHostFileParam_',parameters('emYesOrNo'))),variables(concat('dsuHostFileParam_',parameters('dsuYesOrNo'))),variables(concat('smHostFileParam_',parameters('smYesOrNo'))),variables(concat('dmHostFileParam_',parameters('dmYesOrNo'))))]",
+			"smAnsible_Yes": "[concat(' sm_admin_pass=',parameters('smAdminPassword'),' sm_rest_pass=',parameters('smRESTPassword'),' siteid=',parameters('smSiteID'))]",
+			"smAnsible_No": "",
+			"dmAnsible_Yes": "[concat('  dm_dbc_password=',parameters('dmDBCPassword'),' dm_datamover_password=',parameters('dmIntPassword'))]",
+			"dmAnsible_No": "",
+			"dsuAnsible_Yes": "[concat(' dsu_dbc_password=',parameters('dsuDBCPassword'),' dsu_admin_password=',parameters('dsuadminPassword'))]",
+			"dsuAnsible_No": "",
+			"ansibleparam": "[concat('cloud_env=aws system_name=',parameters('vmNamePrefixDatabase'),' system_nickname=',parameters('vpSystemNickName'),' dbc_pass=',parameters('dbsPassword'),' ntp_server_list=',parameters('ntpServerlist'),' vp_portal_password=',parameters('vpportalpassword'),variables(concat('smAnsible_',parameters('smYesOrNo'))),variables(concat('dmAnsible_',parameters('dmYesOrNo'))),variables(concat('dsuAnsible_',parameters('dsuYesOrNo'))))]",
+			"vnet": "[concat('vnet',uniqueString(resourceGroup().id))]",
+			"publicIP": "[concat('publicIP',uniqueString(resourceGroup().id))]",
+			"database": "[concat('database',uniqueString(resourceGroup().id))]",
+			"viewpoint": "[concat('viewpoint',uniqueString(resourceGroup().id))]",
+			"datamover": "[concat('datamover',uniqueString(resourceGroup().id))]",
+			"dsu": "[concat('dsc',uniqueString(resourceGroup().id))]",
+			"serverManagement": "[concat('serverManagement',uniqueString(resourceGroup().id))]",
+			"ecosystemmanager": "[concat('ecosystemmanager',uniqueString(resourceGroup().id))]",
+			"diskCaching_5TB": "ReadOnly",
+			"diskCaching_20TB": "None",
+			"diskCaching_0TB": "None",
+			"diskCaching": "[variables(concat('diskCaching_',parameters('clusterVMStorageSize')))]"
+		},
+		"resources": [
+			{
+				"apiVersion": "[variables('apiVersions').storage.storageAccounts]",
+				"type": "Microsoft.Storage/storageAccounts",
+				"name": "[variables('diagnosticsStorageAccount')]",
+				"location": "[parameters('location')]",
+				"tags": {
+					"provider": "[toUpper(parameters('teradataTags').provider)]"
+				},
+				"kind": "Storage",
+				"sku": {
+					"name": "Standard_LRS"
+				},
+				"properties": {}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').network.networkSecurityGroups]",
+				"type": "Microsoft.Network/networkSecurityGroups",
+				"name": "[variables('nsgName')]",
+				"location": "[parameters('location')]",
+				"tags": {
+					"provider": "[toUpper(parameters('teradataTags').provider)]"
+				},
+				"properties": {
+					"securityRules": [
+						{
+							"name": "Allow_SSH",
+							"properties": {
+								"description": "Allow APP Subnet",
+								"protocol": "Tcp",
+								"sourcePortRange": "*",
+								"destinationPortRange": "22",
+								"sourceAddressPrefix": "*",
+								"destinationAddressPrefix": "*",
+								"access": "Allow",
+								"priority": 100,
+								"direction": "Inbound"
+							}
+						}
+					]
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').resources.deployments]",
+				"type": "Microsoft.Resources/deployments",
+				"name": "[variables('vnet')]",
+				"dependsOn": [
+					"[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgname'))]"
+				],
+				"properties": {
+					"mode": "Incremental",
+					"templateLink": {
+						"uri": "[variables('templateUrlVnet')]",
+						"contentVersion": "1.0.0.0"
+					},
+					"parameters": {
+						"apiVersions": {
+							"value": "[variables('apiVersions')]"
+						},
+						"location": {
+							"value": "[parameters('location')]"
+						},
+						"vnetName": {
+							"value": "[parameters('vnetName')]"
+						},
+						"vnetResourceGroup": {
+							"value": "[parameters('vnetResourceGroup')]"
+						},
+						"vnetAddressSpace": {
+							"value": "[parameters('vnetAddressSpace')]"
+						},
+						"vmSubnetName": {
+							"value": "[parameters('vmSubnetName')]"
+						},
+						"vmSubnetAddressSpace": {
+							"value": "[parameters('vmSubnetAddressSpace')]"
+						},
+						"bynet0SubnetName": {
+							"value": "[parameters('bynet0SubnetName')]"
+						},
+						"bynet0SubnetAddressSpace": {
+							"value": "[parameters('bynet0SubnetAddressSpace')]"
+						},
+						"bynet1SubnetName": {
+							"value": "[parameters('bynet1SubnetName')]"
+						},
+						"bynet1SubnetAddressSpace": {
+							"value": "[parameters('bynet1SubnetAddressSpace')]"
+						},
+						"nsgName": {
+							"value": "[variables('nsgName')]"
+						},
+						"teradataTags": {
+							"value": "[parameters('teradataTags')]"
+						}
+					}
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').resources.deployments]",
+				"type": "Microsoft.Resources/deployments",
+				"name": "[variables('publicIP')]",
+				"dependsOn": [
+					"[variables('vnet')]",
+					"[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgname'))]"
+				],
+				"properties": {
+					"mode": "Incremental",
+					"templateLink": {
+						"uri": "[variables('templateUrlPublicIP')]",
+						"contentVersion": "1.0.0.0"
+					},
+					"parameters": {
+						"apiVersions": {
+							"value": "[variables('apiVersions')]"
+						},
+						"location": {
+							"value": "[parameters('location')]"
+						},
+						"publicIPAddressName": {
+							"value": "[variables('publicIPAddressName')]"
+						},
+						"publicIPAddressType": {
+							"value": "[variables('publicIPAddressType')]"
+						},
+						"publicIPAddressDomainNameLabel": {
+							"value": "[variables('publicIPAddressDomainNameLabel')]"
+						},
+						"vmCount": {
+							"value": "[parameters('vmCountDatabase')]"
+						},
+						"subnet1ID": {
+							"value": "[variables('subnet1ID')]"
+						},
+						"subnet2ID": {
+							"value": "[variables('subnet2ID')]"
+						},
+						"subnet3ID": {
+							"value": "[variables('subnet3ID')]"
+						},
+						"nic1": {
+							"value": "[variables('nic1')]"
+						},
+						"nic2": {
+							"value": "[variables('nic2')]"
+						},
+						"nic3": {
+							"value": "[variables('nic3')]"
+						},
+						"vmSubnetStartAddress": {
+							"value": "[parameters('vmSubnetStartAddress')]"
+						},
+						"bynet0SubnetStartAddress": {
+							"value": "[parameters('bynet0SubnetStartAddress')]"
+						},
+						"bynet1SubnetStartAddress": {
+							"value": "[parameters('bynet1SubnetStartAddress')]"
+						},
+						"nsgName": {
+							"value": "[variables('nsgName')]"
+						},
+						"teradataTags": {
+							"value": "[parameters('teradataTags')]"
+						}
+					}
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').resources.deployments]",
+				"type": "Microsoft.Resources/deployments",
+				"name": "[variables('database')]",
+				"dependsOn": [
+					"[concat('Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccount'))]",
+					"[variables('publicIP')]"
+				],
+				"properties": {
+					"mode": "Incremental",
+					"templateLink": {
+						"uri": "[variables('templateUrlDataBase')]",
+						"contentVersion": "1.0.0.0"
+					},
+					"parameters": {
+						"apiVersions": {
+							"value": "[variables('apiVersions')]"
+						},
+						"location": {
+							"value": "[parameters('location')]"
+						},
+						"adminUsername": {
+							"value": "[parameters('adminUsername')]"
+						},
+						"adminPassword": {
+							"value": "[parameters('adminPassword')]"
+						},
+						"sshPublicKey": {
+							"value": "[parameters('sshPublicKey')]"
+						},
+						"authenticationType": {
+							"value": "[parameters('authenticationType')]"
+						},
+						"dbsPassword": {
+							"value": "[parameters('dbsPassword')]"
+						},
+						"clusterName": {
+							"value": "[parameters('vmNamePrefixDatabase')]"
+						},
+						"vmSize": {
+							"value": "[parameters('clusterVmSizeDataBase')]"
+						},
+						"vmCount": {
+							"value": "[parameters('vmCountDatabase')]"
+						},
+						"vnetName": {
+							"value": "[parameters('vnetName')]"
+						},
+						"vmSubnetStartAddress": {
+							"value": "[parameters('vmSubnetStartAddress')]"
+						},
+						"bynet0SubnetStartAddress": {
+							"value": "[parameters('bynet0SubnetStartAddress')]"
+						},
+						"bynet1SubnetStartAddress": {
+							"value": "[parameters('bynet1SubnetStartAddress')]"
+						},
+						"bynet0SubnetAddressSpace": {
+							"value": "[parameters('bynet0SubnetAddressSpace')]"
+						},
+						"bynet1SubnetAddressSpace": {
+							"value": "[parameters('bynet1SubnetAddressSpace')]"
+						},
+						"storageAccountDiagnostics": {
+							"value": "[variables('diagnosticsStorageAccount')]"
+						},
+						"tdcTimeZone": {
+							"value": "[parameters('tdcTimeZone')]"
+						},
+						"scriptUrlInit": {
+							"value": "[variables('scriptUrlInit')]"
+						},
+						"sharedStorageAccountType": {
+							"value": "[variables('sharedStorageAccountType')]"
+						},
+						"imageStorageAccountType": {
+							"value": "[variables('imageStorageAccountType')]"
+						},
+						"osStorageAccountCount": {
+							"value": "[variables('osStorageAccountCount')]"
+						},
+						"datadiskSize": {
+							"value": "[variables('datadiskSize')]"
+						},
+						"skuTypeValue": {
+							"value": "[variables('skuTypeValue')]"
+						},
+						"imagePublisher": {
+							"value": "[variables('imagePublisher')]"
+						},
+						"imageOffer": {
+							"value": "[variables('imageOffer')]"
+						},
+						"imageSku": {
+							"value": "[variables('imageSku')]"
+						},
+						"diskCaching":{
+							"value":"[variables('diskCaching')]"
+						},
+						"dataStorageAccountCount": {
+							"value": "[variables('dataStorageAccountCount')]"
+						},
+						"kanjiSupport": {
+							"value": "[variables('kanjiSupport')]"
+						},
+						"ntpServerlist": {
+							"value": "[parameters('ntpServerlist')]"
+						},
+						"teradataTags": {
+							"value": "[parameters('teradataTags')]"
+						}
+					}
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').resources.deployments]",
+				"type": "Microsoft.Resources/deployments",
+				"name": "[variables('datamover')]",
+				"dependsOn": [
+					"[variables('vnet')]"
+				],
+				"properties": {
+					"mode": "Incremental",
+					"templateLink": {
+						"uri": "[variables('templateUrlDatamover')]",
+						"contentVersion": "1.0.0.0"
+					},
+					"parameters": {
+						"apiVersions": {
+							"value": "[variables('apiVersions')]"
+						},
+						"location": {
+							"value": "[parameters('location')]"
+						},
+						"adminUsername": {
+							"value": "[parameters('adminUsername')]"
+						},
+						"dmPassword": {
+							"value": "[parameters('dmPassword')]"
+						},
+						"dmSshPublicKey": {
+							"value": "[parameters('dmSshPublicKey')]"
+						},
+						"dmAuthenticationType": {
+							"value": "[parameters('dmAuthenticationType')]"
+						},
+						"dmDBCPassword": {
+							"value": "[parameters('dmDBCPassword')]"
+						},
+						"dmIntPassword": {
+							"value": "[parameters('dmIntPassword')]"
+						},
+						"dmSystemPrefix": {
+							"value": "[parameters('dmSystemPrefix')]"
+						},
+						"dmSystemCount": {
+							"value": "[variables('dmSystemCount')]"
+						},
+						"dmAgentCount": {
+							"value": "[parameters('dmAgentNodeCount')]"
+						},
+						"dmMasterCount": {
+							"value": "[variables('dmMasterCount')]"
+						},
+						"dmVMSize": {
+							"value": "[parameters('dmClusterVmSize')]"
+						},
+						"subnet1DMID": {
+							"value": "[variables('subnet1ID')]"
+						},
+						"dmSubnetStartAddress": {
+							"value": "[variables('dmSubnetStartAddress')]"
+						},
+						"vmSubnetAddressSpace": {
+							"value": "[parameters('vmSubnetAddressSpace')]"
+						},
+						"imagePublisher": {
+							"value": "[variables('imagePublisherDM')]"
+						},
+						"imageOffer": {
+							"value": "[variables('imageOfferDM')]"
+						},
+						"imageSku": {
+							"value": "[variables('imageSkuDM')]"
+						},
+						"imageOfferAgent": {
+							"value": "[variables('imageOfferAgent')]"
+						},
+						"imageSkuAgent": {
+							"value": "[variables('imageSkuAgent')]"
+						},
+						"imageStorageAccountType": {
+							"value": "[variables('dmImageStorageAccountType')]"
+						},
+						"sharedStorageAccountType": {
+							"value": "[variables('dmSharedStorageAccountType')]"
+						},
+						"tdcTimeZone": {
+							"value": "[parameters('tdcTimeZone')]"
+						},
+						"ntpServerlist": {
+							"value": "[parameters('ntpServerlist')]"
+						},
+						"scriptUrlInit": {
+							"value": "[variables('baseUrl')]"
+						},
+						"teradataTags": {
+							"value": "[parameters('teradataTags')]"
+						}
+					}
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').resources.deployments]",
+				"type": "Microsoft.Resources/deployments",
+				"name": "[variables('serverManagement')]",
+				"dependsOn": [
+					"[variables('vnet')]"
+				],
+				"properties": {
+					"mode": "Incremental",
+					"templateLink": {
+						"uri": "[variables('templateUrlServerManagement')]",
+						"contentVersion": "1.0.0.0"
+					},
+					"parameters": {
+						"apiVersions": {
+							"value": "[variables('apiVersions')]"
+						},
+						"location": {
+							"value": "[parameters('location')]"
+						},
+						"adminUsername": {
+							"value": "[parameters('adminUsername')]"
+						},
+						"smSiteID": {
+							"value": "[parameters('smSiteID')]"
+						},
+						"smPassword": {
+							"value": "[parameters('smPassword')]"
+						},
+						"smSshPublicKey": {
+							"value": "[parameters('smSshPublicKey')]"
+						},
+						"smAuthenticationType": {
+							"value": "[parameters('smAuthenticationType')]"
+						},
+						"smAdminPassword": {
+							"value": "[parameters('smAdminPassword')]"
+						},
+						"smRESTPassword": {
+							"value": "[parameters('smRESTPassword')]"
+						},
+						"smSystemCount": {
+							"value": "[variables('smSystemCount')]"
+						},
+						"smSystemPrefix": {
+							"value": "[variables('smSystemPrefix')]"
+						},
+						"smVMSize": {
+							"value": "[parameters('smClusterVmSize')]"
+						},
+						"subnet1SMID": {
+							"value": "[variables('subnet1ID')]"
+						},
+						"smSubnetStartAddress": {
+							"value": "[variables('smSubnetStartAddress')]"
+						},
+						"imagePublisher": {
+							"value": "[variables('imagePublisherSM')]"
+						},
+						"imageOffer": {
+							"value": "[variables('imageOfferSM')]"
+						},
+						"vmSubnetAddressSpace": {
+							"value": "[parameters('vmSubnetAddressSpace')]"
+						},
+						"imageSku": {
+							"value": "[variables('imageSkuSM')]"
+						},
+						"imageStorageAccountType": {
+							"value": "[variables('smImageStorageAccountType')]"
+						},
+						"sharedStorageAccountType": {
+							"value": "[variables('smSharedStorageAccountType')]"
+						},
+						"tdcTimeZone": {
+							"value": "[parameters('tdcTimeZone')]"
+						},
+						"ntpServerlist": {
+							"value": "[parameters('ntpServerlist')]"
+						},
+						"scriptUrlInit": {
+							"value": "[variables('baseUrl')]"
+						},
+						"teradataTags": {
+							"value": "[parameters('teradataTags')]"
+						}
+					}
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').resources.deployments]",
+				"type": "Microsoft.Resources/deployments",
+				"name": "[variables('dsu')]",
+				"dependsOn": [
+					"[variables('vnet')]"
+				],
+				"properties": {
+					"mode": "Incremental",
+					"templateLink": {
+						"uri": "[variables('templateUrlDsu')]",
+						"contentVersion": "1.0.0.0"
+					},
+					"parameters": {
+						"apiVersions": {
+							"value": "[variables('apiVersions')]"
+						},
+						"location": {
+							"value": "[parameters('location')]"
+						},
+						"adminUsername": {
+							"value": "[parameters('adminUsername')]"
+						},
+						"dsuPassword": {
+							"value": "[parameters('dsuPassword')]"
+						},
+						"dsuSshPublicKey": {
+							"value": "[parameters('dsuSshPublicKey')]"
+						},
+						"dsuAuthenticationType": {
+							"value": "[parameters('dsuAuthenticationType')]"
+						},
+						"dsuDBCPassword": {
+							"value": "[parameters('dsuDBCPassword')]"
+						},
+						"dsuIntPassword": {
+							"value": "[parameters('dsuIntPassword')]"
+						},
+						"dsuSystemPrefix": {
+							"value": "[parameters('dsuSystemPrefix')]"
+						},
+						"dsuNodeCount": {
+							"value": "[variables('dsuNodeCount')]"
+						},
+						"dsuVMSize": {
+							"value": "[parameters('dsuClusterVmSize')]"
+						},
+						"subnet1DsuID": {
+							"value": "[variables('subnet1ID')]"
+						},
+						"dsuSubnetStartAddress": {
+							"value": "[variables('dsuSubnetStartAddress')]"
+						},
+						"vmSubnetAddressSpace": {
+							"value": "[parameters('vmSubnetAddressSpace')]"
+						},
+						"imagePublisher": {
+							"value": "[variables('imagePublisherDSU')]"
+						},
+						"imageOffer": {
+							"value": "[variables('imageOfferDSU')]"
+						},
+						"imageSku": {
+							"value": "[variables('imageSkuDSU')]"
+						},
+						"imageStorageAccountType": {
+							"value": "[variables('dsuImageStorageAccountType')]"
+						},
+						"sharedStorageAccountType": {
+							"value": "[variables('dsuSharedStorageAccountType')]"
+						},
+						"tdcTimeZone": {
+							"value": "[parameters('tdcTimeZone')]"
+						},
+						"ntpServerlist": {
+							"value": "[parameters('ntpServerlist')]"
+						},
+						"scriptUrlInit": {
+							"value": "[variables('baseUrl')]"
+						},
+						"teradataTags": {
+							"value": "[parameters('teradataTags')]"
+						}
+					}
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').resources.deployments]",
+				"type": "Microsoft.Resources/deployments",
+				"name": "[variables('ecosystemmanager')]",
+				"dependsOn": [
+					"[variables('vnet')]"
+				],
+				"properties": {
+					"mode": "Incremental",
+					"templateLink": {
+						"uri": "[variables('templateUrlEcosystemmanager')]",
+						"contentVersion": "1.0.0.0"
+					},
+					"parameters": {
+						"apiVersions": {
+							"value": "[variables('apiVersions')]"
+						},
+						"location": {
+							"value": "[parameters('location')]"
+						},
+						"adminUsername": {
+							"value": "[parameters('adminUsername')]"
+						},
+						"emPassword": {
+							"value": "[parameters('emPassword')]"
+						},
+						"emSshPublicKey": {
+							"value": "[parameters('emSshPublicKey')]"
+						},
+						"emAuthenticationType": {
+							"value": "[parameters('emAuthenticationType')]"
+						},
+						"clusterName": {
+							"value": "[parameters('vmNamePrefixDatabase')]"
+						},
+						"vmCount": {
+							"value": "[parameters('vmCountDatabase')]"
+						},
+						"vmSubnetStartAddress": {
+							"value": "[parameters('vmSubnetStartAddress')]"
+						},
+						"emSystemNamePrefix": {
+							"value": "[parameters('emSystemNamePrefix')]"
+						},
+						"emNodeCount": {
+							"value": "[variables('emNodeCount')]"
+						},
+						"emVMSize": {
+							"value": "[parameters('emVmSize')]"
+						},
+						"subnet1EMID": {
+							"value": "[variables('subnet1ID')]"
+						},
+						"emSubnetStartAddress": {
+							"value": "[variables('emSubnetStartAddress')]"
+						},
+						"vmSubnetAddressSpace": {
+							"value": "[parameters('vmSubnetAddressSpace')]"
+						},
+						"sharedStorageAccountType": {
+							"value": "[variables('sharedStorageAccountType')]"
+						},
+						"imageStorageAccountType": {
+							"value": "[variables('emImageStorageAccountType')]"
+						},
+						"imagePublisher": {
+							"value": "[variables('imagePublisherEM')]"
+						},
+						"imageOffer": {
+							"value": "[variables('imageOfferEM')]"
+						},
+						"imageSku": {
+							"value": "[variables('imageSkuEM')]"
+						},
+						"tdcTimeZone": {
+							"value": "[parameters('tdcTimeZone')]"
+						},
+						"ntpServerlist": {
+							"value": "[parameters('ntpServerlist')]"
+						},
+						"scriptUrlInit": {
+							"value": "[variables('baseUrl')]"
+						},
+						"teradataTags": {
+							"value": "[parameters('teradataTags')]"
+						}
+					}
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').resources.deployments]",
+				"type": "Microsoft.Resources/deployments",
+				"name": "[variables('viewpoint')]",
+				"dependsOn": [
+					"[variables('vnet')]",
+					"[variables('datamover')]",
+					"[variables('dsu')]",
+					"[variables('serverManagement')]",
+					"[variables('database')]",
+					"[variables('ecosystemmanager')]"
+				],
+				"properties": {
+					"mode": "Incremental",
+					"templateLink": {
+						"uri": "[variables('templateUrlViewpoint')]",
+						"contentVersion": "1.0.0.0"
+					},
+					"parameters": {
+						"apiVersions": {
+							"value": "[variables('apiVersions')]"
+						},
+						"location": {
+							"value": "[parameters('location')]"
+						},
+						"adminUsername": {
+							"value": "[parameters('adminUsername')]"
+						},
+						"vpPassword": {
+							"value": "[parameters('vpPassword')]"
+						},
+						"vpSshPublicKey": {
+							"value": "[parameters('vpSshPublicKey')]"
+						},
+						"vpAuthenticationType": {
+							"value": "[parameters('vpAuthenticationType')]"
+						},
+						"clusterName": {
+							"value": "[parameters('vmNamePrefixDatabase')]"
+						},
+						"vmCount": {
+							"value": "[parameters('vmCountDatabase')]"
+						},
+						"vmSubnetStartAddress": {
+							"value": "[parameters('vmSubnetStartAddress')]"
+						},
+						"vmSubnetAddressSpace": {
+							"value": "[parameters('vmSubnetAddressSpace')]"
+						},
+						"vpSystemNamePrefix": {
+							"value": "[parameters('vpSystemNamePrefix')]"
+						},
+						"vpNodeCount": {
+							"value": "[variables('vpNodeCount')]"
+						},
+						"vpVMSize": {
+							"value": "[parameters('vpVmSize')]"
+						},
+						"subnet1VPID": {
+							"value": "[variables('subnet1ID')]"
+						},
+						"vpSubnetStartAddress": {
+							"value": "[variables('vpSubnetStartAddress')]"
+						},
+						"sharedStorageAccountType": {
+							"value": "[variables('sharedStorageAccountType')]"
+						},
+						"imageStorageAccountType": {
+							"value": "[variables('vpImageStorageAccountType')]"
+						},
+						"imagePublisher": {
+							"value": "[variables('imagePublisherVP')]"
+						},
+						"imageOffer": {
+							"value": "[variables('imageOfferVP')]"
+						},
+						"imageSku": {
+							"value": "[variables('imageSkuVP')]"
+						},
+						"scriptHostUrl": {
+							"value": "[variables('scriptHostUrlvp')]"
+						},
+						"generateHostFileParam": {
+							"value": "[variables('generateHostFileParam')]"
+						},
+						"ansibleparam": {
+							"value": "[variables('ansibleparam')]"
+						},
+						"vpportalpassword": {
+							"value": "[parameters('vpportalpassword')]"
+						},
+						"vpSystemNickName": {
+							"value": "[parameters('vpSystemNickName')]"
+						},
+						"tdcTimeZone": {
+							"value": "[parameters('tdcTimeZone')]"
+						},
+						"ntpServerlist": {
+							"value": "[parameters('ntpServerlist')]"
+						},
+						"scriptUrlInit": {
+							"value": "[variables('baseUrl')]"
+						},
+						"teradataTags": {
+							"value": "[parameters('teradataTags')]"
+						}
+					}
+				}
+			}
+		],
+		"outputs": {}
+}

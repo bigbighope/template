@@ -1,0 +1,193 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "artifactsBaseUrl": {
+            "value": "https://testteraseattle1.blob.core.windows.net/ga-external"
+        },
+    "location": {
+        "value": "eastus"
+    },
+    "adminUsername": {
+        "value": "azureuser"
+    },
+    "authenticationType": {
+        "value": "password"
+    },
+    "adminPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "vmNamePrefixDatabase": {
+        "value": "database"
+    },
+    "dbsPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "vmCountDatabase": {
+        "value": 2
+    },
+    "clusterVmSizeDataBase": {
+        "value": "Standard_DS15_v2"
+    },
+    "clusterVMStorageSize": {
+        "value": "5TB"
+    },
+    "tdcTimeZone": {
+        "value": "US/Pacific"
+    },
+    "ntpServerlist": {
+        "value": "0.pool.ntp.org,1.pool.ntp.org,2.pool.ntp.org,3.pool.ntp.org"
+    },
+    "japaneseSupport": {
+        "value": "No"
+    },
+    "vnetResourceGroup": {
+        "value": "WendeAutomationTestResourceGroup"
+    },
+    "vnetName": {
+        "value": "vnet-teradata"
+    },
+    "vnetNewOrExisting": {
+        "value": "new"
+    },
+    "vnetAddressSpace": {
+        "value": "10.0.0.0/16"
+    },
+    "vmSubnetName": {
+        "value": "vmsubnet"
+    },
+    "vmSubnetAddressSpace": {
+        "value": "10.0.0.0/24"
+    },
+    "vmSubnetStartAddress": {
+        "value": "10.0.0.4"
+    },
+    "bynet0SubnetName": {
+        "value": "bynet0"
+    },
+    "bynet0SubnetAddressSpace": {
+        "value": "10.0.1.0/24"
+    },
+    "bynet0SubnetStartAddress": {
+        "value": "10.0.1.4"
+    },
+    "bynet1SubnetName": {
+        "value": "bynet1"
+    },
+    "bynet1SubnetAddressSpace": {
+        "value": "10.0.2.0/24"
+    },
+    "bynet1SubnetStartAddress": {
+        "value": "10.0.2.4"
+    },
+    "dmPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "dmAuthenticationType": {
+        "value": "password"
+    },
+    "dmDBCPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "dmIntPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "dmSystemPrefix": {
+        "value": "datamover"
+    },
+    "dmAgentNodeCount": {
+        "value": 0
+    },
+    "dmClusterVmSize": {
+        "value": "Standard_DS5_v2"
+    },
+    "dmYesOrNo": {
+        "value": "Yes"
+    },
+    "smPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "smAuthenticationType": {
+        "value": "password"
+    },
+    "smSiteID": {
+        "value": "REV123"
+    },
+    "smAdminPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "smRESTPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "smClusterVmSize": {
+        "value": "Standard_DS3_v2"
+    },
+    "smYesOrNo": {
+        "value": "Yes"
+    },
+    "vpPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "vpAuthenticationType": {
+        "value": "password"
+    },
+    "vpSystemNamePrefix": {
+        "value": "viewpoint"
+    },
+    "vpVmSize": {
+        "value": "Standard_DS5_v2"
+    },
+    "vpYesOrNo": {
+        "value": "Yes"
+    },
+    "vpportalpassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "vpSystemNickName": {
+        "value": "database"
+    },
+    "vpSku": {
+        "value": "tdinternal-viewpoint-multiple-systems"
+    },
+    "emPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "emAuthenticationType": {
+        "value": "password"
+    },
+    "emSystemNamePrefix": {
+        "value": "ecosysmgr"
+    },
+    "emVmSize": {
+        "value": "Standard_DS5_v2"
+    },
+    "emYesOrNo": {
+        "value": "Yes"
+    },
+    "dsuPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "dsuAuthenticationType": {
+        "value": "password"
+    },
+    "dsuDBCPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "dsuadminPassword": {
+        "value": "Qwertyqwerty1"
+    },
+    "dsuSystemPrefix": {
+        "value": "dsc"
+    },
+    "dsuAgentNodeCount": {
+        "value": 0
+    },
+    "dsuClusterVmSize": {
+        "value": "Standard_DS4_v2"
+    },
+    "dsuYesOrNo": {
+        "value": "Yes"
+    }
+  }
+
+}
