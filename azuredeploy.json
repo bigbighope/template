@@ -491,6 +491,26 @@
 				"metadata": {
 					"description": "Name of the Recovery Service Vault"
 				}
+			},
+			"barStorageAccountName": {
+				"type": "string",
+				"defaultValue": "wendebarstorageaccount"
+			},
+			"encryptionEnabled": {
+				"type": "bool",
+				"defaultValue": false
+			},
+			"httpsTrafficOnlyEnabled": {
+				"type": "bool",
+				"defaultValue": false
+			},
+			"accessTier": {
+				"type": "string",
+				"defaultValue": "Cool",
+				"allowedValues": [
+					"Cool",
+					"Hot"
+				]
 			}
 		},
 		"variables": {
@@ -733,7 +753,6 @@
 				"name": "[parameters('recoveryServiceVaultName')]",
 				"dependsOn": [
 					"[variables('vnet')]",
-					"[variables('dsu')]",
 					"[variables('database')]"
 				],
 				"location": "[parameters('location')]",
@@ -745,6 +764,37 @@
 					"tier": "Standard"
 				},
 				"properties": {}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').storage.storageAccounts]",
+				"type": "Microsoft.Storage/storageAccounts",
+				"name": "[parameters('barStorageAccountName')]",
+				"dependsOn": [
+					"[variables('vnet')]",
+					"[variables('database')]",
+					"[variables('dsu')]",
+					"[variables('viewpoint')]"
+				],
+				"location": "[parameters('location')]",
+				"tags": {
+					"provider": "[toUpper(parameters('teradataTags').provider)]"
+				},
+				"kind": "BlobStorage",
+				"sku": {
+                	"name": "Standard_LRS"
+            	},
+				"properties": {
+					"accessTier": "[parameters('accessTier')]",
+					"encryption": {
+						"services": {
+							"blob": {
+								"enabled": "[parameters('encryptionEnabled')]"
+							}
+						},
+						"keySource": "Microsoft.Storage"
+					},
+					"supportsHttpsTrafficOnly": "[parameters('httpsTrafficOnlyEnabled')]"
+				}
 			},
 			{
 				"apiVersion": "[variables('apiVersions').storage.storageAccounts]",
