@@ -492,6 +492,27 @@
 					"description": "Name of the Recovery Service Vault"
 				}
 			},
+			"policyName": {
+				"type": "string",
+				"defaultValue": "WendevmDailyBackupPolicy",	
+				"metadata": {
+					"description": "Backcup policy name"
+				}
+			},
+			"scheduleRunTimes": {
+				"type": "array",
+				"defaultValue": ["03:00"],
+				"metadata": {
+					"description": "Times in day when backup should be triggered. e.g. 01:00, 13:00. This will be used in LTR too for daily, weekly, monthly and yearly backup."
+            	}
+			},
+			"dailyRetentionDurationCount": {
+				"type": "int",
+				"defaultValue": 90,
+				"metadata": {
+					"description": "Number of days you want to retain the backup"
+				}
+			},
 			"barStorageAccountName": {
 				"type": "string",
 				"defaultValue": "wendebarstorageaccount"
@@ -764,6 +785,84 @@
 					"tier": "Standard"
 				},
 				"properties": {}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').recoveryServices.vaults]",
+				"name": "[concat('backupPolicies/', parameters('policyName'))]",
+				"type": "Microsoft.RecoveryServices/vaults/backupPolicies",
+				"dependsOn": [ "[concat('Microsoft.RecoveryServices/vaults/', parameters('recoveryServiceVaultName'))]" ],
+				"location": "[parameters('location')]",
+				"tags": {
+					"provider": "[toUpper(parameters('teradataTags').provider)]"
+				},
+				"properties": {
+					"backupManagementType": "AzureIaasVM",
+					"protectedItemsCount": "[parameters('vmCountDatabase')]",
+					"schedulePolicy": {
+						"scheduleRunFrequency": "Daily",
+						"scheduleRunDays": null,
+						"scheduleRunTimes": "[parameters('scheduleRunTimes')]",				
+						"schedulePolicyType": "SimpleSchedulePolicy"
+					},
+					"retentionPolicy": {
+						"dailySchedule": {
+							"retentionTimes": "[parameters('scheduleRunTimes')]",
+							"retentionDuration": {
+								"count": "[parameters('dailyRetentionDurationCount')]",
+								"durationType": "Days"
+							}
+						}
+					}
+				}
+			},
+			{
+				"apiVersion": "2016-12-01",
+				"name": "vaults/Azure/protectionContainer/WendeProtectedItem",
+				"type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
+				"location": "[parameters('location')]",
+				"tags": {
+					"provider": "[toUpper(parameters('teradataTags').provider)]"
+				},
+				"copy": {
+					"name": "v2VmsCopy",
+					"count": "[parameters('vmCountDatabase')]"
+				},
+				"properties": {
+					"protectedItemType": "Microsoft.Compute/virtualMachines",
+					"policyId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', parameters('recoveryServiceVaultName'), parameters('recoveryPolicy'))]",
+					"sourceResourceId": "[resourceId(subscription().subscriptionId ,parameters('vnetResourceGroup'),'Microsoft.Compute/virtualMachines', concat(parameters('vmNamePrefixDatabase'), copyindex()) )]"
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').storage.storageAccounts]",
+				"type": "Microsoft.Storage/storageAccounts",
+				"name": "[parameters('barStorageAccountName')]",
+				"dependsOn": [
+					"[variables('vnet')]",
+					"[variables('database')]",
+					"[variables('dsu')]",
+					"[variables('viewpoint')]"
+				],
+				"location": "[parameters('location')]",
+				"tags": {
+					"provider": "[toUpper(parameters('teradataTags').provider)]"
+				},
+				"kind": "BlobStorage",
+				"sku": {
+                	"name": "Standard_LRS"
+            	 	},
+				"properties": {
+					"accessTier": "[parameters('accessTier')]",
+					"encryption": {
+						"services": {
+							"blob": {
+								"enabled": "[parameters('encryptionEnabled')]"
+							}
+						},
+						"keySource": "Microsoft.Storage"
+					},
+					"supportsHttpsTrafficOnly": "[parameters('httpsTrafficOnlyEnabled')]"
+				}
 			},
 			{
 				"apiVersion": "[variables('apiVersions').storage.storageAccounts]",
