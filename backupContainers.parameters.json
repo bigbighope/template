@@ -1,0 +1,30 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "existingRecoveryServicesVaultName": {
+      "value": "RSVault1"
+    },
+    "existingProtectionContainers": {
+      "value": [
+        "iaasvmcontainer;iaasvmcontainerv2;WendeAutomationTestResourceGroup;backupTargetVm1",
+        "iaasvmcontainer;iaasvmcontainerv2;WendeAutomationTestResourceGroup;backupTargetVm2"
+      ]
+    },
+    "existingProtectableItems": {
+      "value": [
+        "vm;iaasvmcontainerv2;WendeAutomationTestResourceGroup;backupTargetVm1",
+        "vm;iaasvmcontainerv2;WendeAutomationTestResourceGroup;backupTargetVm2"
+      ]
+    },
+    "existingBackupPolicyName": {
+      "value": "DailyBackupPolicy1"
+    },
+    "existingSourceResourceIds": {
+      "value": [
+        "/subscriptions/6da52b34-d52a-4305-a580-00a3bf506c8e/resourceGroups/WendeAutomationTestResourceGroup/providers/Microsoft.Compute/virtualMachines/backupTargetVm1",
+        "/subscriptions/6da52b34-d52a-4305-a580-00a3bf506c8e/resourceGroups/WendeAutomationTestResourceGroup/providers/Microsoft.Compute/virtualMachines/backupTargetVm2"
+        ]
+    }
+  }
+}
