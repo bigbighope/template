@@ -575,7 +575,8 @@
 					"deployments": "2016-09-01"
 				},
 				"recoveryServices": {
-					"vaults": "2016-06-01"
+					"vaults": "2016-06-01",
+					"policies": "2015-11-10"
 				},
 				"storage": {
 					"storageAccounts": "2016-12-01"
@@ -822,7 +823,7 @@
 				"properties": {}
 			},
 			{
-				"apiVersion": "2015-11-10",
+				"apiVersion": "[variables('apiVersions').recoveryServices.policies]",
 				"name": "[concat(parameters('recoveryServiceVaultName'), '/', parameters('policyName'))]",
 				"type": "Microsoft.RecoveryServices/vaults/backupPolicies",
 				"dependsOn": [ "[concat('Microsoft.RecoveryServices/vaults/', parameters('recoveryServiceVaultName'))]" ],
