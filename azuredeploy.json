@@ -818,21 +818,21 @@
 			{
 				"apiVersion": "2016-12-01",
 				"name": "vaults/Azure/protectionContainer/WendeProtectedItem",
-                "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
+				"type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
 				"location": "[parameters('location')]",
 				"tags": {
 					"provider": "[toUpper(parameters('teradataTags').provider)]"
 				},
-                "copy": {
-                    "name": "v2VmsCopy",
-                    "count": "[parameters('vmCountDatabase')]"
-                },
-                "properties": {
-                    "protectedItemType": "Microsoft.Compute/virtualMachines",
-                    "policyId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', parameters('recoveryServiceVaultName'), parameters('recoveryPolicy'))]",
-                    "sourceResourceId": "[resourceId(subscription().subscriptionId ,parameters('vnetResourceGroup'),'Microsoft.Compute/virtualMachines', concat(parameters('vmNamePrefixDatabase'), copyindex()) )]"
-                }
-            },
+				"copy": {
+					"name": "v2VmsCopy",
+					"count": "[parameters('vmCountDatabase')]"
+				},
+				"properties": {
+					"protectedItemType": "Microsoft.Compute/virtualMachines",
+					"policyId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', parameters('recoveryServiceVaultName'), parameters('recoveryPolicy'))]",
+					"sourceResourceId": "[resourceId(subscription().subscriptionId ,parameters('vnetResourceGroup'),'Microsoft.Compute/virtualMachines', concat(parameters('vmNamePrefixDatabase'), copyindex()) )]"
+				}
+			},
 			{
 				"apiVersion": "[variables('apiVersions').storage.storageAccounts]",
 				"type": "Microsoft.Storage/storageAccounts",
