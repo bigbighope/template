@@ -20,6 +20,13 @@
                 "description": "Times in day when backup should be triggered. e.g. 01:00, 13:00. This will be used in LTR too for daily, weekly, monthly and yearly backup."
             }
         },
+        "timeZone": {
+            "type": "string",
+            "defaultValue": "Pacific Standard Time",
+            "metadata": {
+                "description": ""
+            }
+        },
         "dailyRetentionDurationCount": {
             "type": "int",
             "metadata": {
@@ -78,6 +85,7 @@
         "location": "[resourceGroup().location]",
         "properties": {
           "backupManagementType": "AzureIaasVM",
+          "timeZone": "[parameters('timeZone')]",
           "schedulePolicy": {
             "scheduleRunFrequency": "Daily",
             "scheduleRunDays": null,

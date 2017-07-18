@@ -8,8 +8,11 @@
     "policyName": {
         "value": "DailyBackupPolicy1"
     },
+    "timeZone": {
+        "value": "Pacific Standard Time"
+    },  
     "scheduleRunTimes": {
-        "value": [ "2017-01-26T05:30:00Z" ]
+        "value": [ "2017-07-16T08:00:00.000Z" ]
     },
     "dailyRetentionDurationCount": {
         "value": 104
