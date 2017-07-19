@@ -487,14 +487,14 @@
 			},
 			"recoveryServiceVaultName": {
 				"type": "string",
-				"defaultValue": "WendeRecoverServiceVault",	
+				"defaultValue": "wendeRecoverServiceVault",	
 				"metadata": {
 					"description": "Name of the Recovery Service Vault"
 				}
 			},
 			"policyName": {
 				"type": "string",
-				"defaultValue": "WendevmDailyBackupPolicy",	
+				"defaultValue": "wendevmDailyBackupPolicy",	
 				"metadata": {
 					"description": "Backcup policy name"
 				}
@@ -576,7 +576,8 @@
 				},
 				"recoveryServices": {
 					"vaults": "2016-06-01",
-					"policies": "2015-11-10"
+					"policies": "2015-11-10",
+					"protectedItems": "2016-06-01"
 				},
 				"storage": {
 					"storageAccounts": "2016-12-01"
@@ -890,6 +891,25 @@
 						},
 						"retentionPolicyType": "LongTermRetentionPolicy"
 					}
+				}
+			},
+			{
+				"name": "[concat(parameters('recoveryServiceVaultName'), '/Azure/iaasvmcontainer;iaasvmcontainerv2;', concat(parameters('vnetResourceGroup'),';', variables('vm'), copyIndex()), '/vm;iaasvmcontainerv2;', concat(parameters('vnetResourceGroup'),';', variables('vm'), copyIndex()))]",
+				"apiVersion": "[variables('apiVersions').recoveryServices.protectedItems]",
+				"location": "[parameters('location')]",
+				"type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
+				"dependsOn": [
+					"[concat('Microsoft.RecoveryServices/vaults/', parameters('recoveryServiceVaultName'))]",
+					"[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', parameters('recoveryServiceVaultName'), parameters('policyName'))]"
+				],
+				"copy": {
+					"name": "protectedItemsCopy",
+					"count": "[parameters('vmCountDatabase')]"
+				},
+				"properties": {
+					"protectedItemType": "Microsoft.ClassicCompute/virtualMachines",
+					"policyId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', parameters('recoveryServiceVaultName'), parameters('policyName'))]",
+					"sourceResourceId": "[resourceId(subscription().subscriptionId, parameters('vnetResourceGroup'),'Microsoft.Compute/virtualMachines', concat(variables('vm'), copyIndex()))]"
 				}
 			},
 			{
