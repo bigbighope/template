@@ -809,8 +809,8 @@
 			"diskCaching": "[variables(concat('diskCaching_',parameters('clusterVMStorageSize')))]",
 			"functionAppName": "[concat(parameters('vmNamePrefixDatabase'),'-', 'wendeAppName')]",
 			"hostingPlanName": "[concat(parameters('vmNamePrefixDatabase'),'-', 'wendeAppName')]",
-        	"functionStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'azfunctions')]",
-    		"functionStorageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('functionStorageAccountName'))]"
+			"functionStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'azfunctions')]",
+			"functionStorageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('functionStorageAccountName'))]"
 		},
 		"resources": [
 			{
