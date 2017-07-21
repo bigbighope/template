@@ -574,6 +574,10 @@
 				"resources": {
 					"deployments": "2016-09-01"
 				},
+				"web":{
+					"serverfarms": "2015-04-01",
+					"sites": "2015-08-01"
+				},
 				"recoveryServices": {
 					"vaults": "2016-06-01",
 					"policies": "2015-11-10",
@@ -802,9 +806,76 @@
 			"diskCaching_5TB": "ReadOnly",
 			"diskCaching_20TB": "None",
 			"diskCaching_0TB": "None",
-			"diskCaching": "[variables(concat('diskCaching_',parameters('clusterVMStorageSize')))]"
+			"diskCaching": "[variables(concat('diskCaching_',parameters('clusterVMStorageSize')))]",
+			"functionAppName": "[concat(parameters('vmNamePrefixDatabase'),'-', 'wendeAppName')]",
+			"hostingPlanName": "[concat(parameters('vmNamePrefixDatabase'),'-', 'wendeAppName')]",
+        	"functionStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'azfunctions')]",
+    		"functionStorageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('functionStorageAccountName'))]"
 		},
 		"resources": [
+			{
+				"apiVersion": "[variables('apiVersions').storage.storageAccounts]",
+				"name": "[variables('functionStorageAccountName')]",
+				"type": "Microsoft.Storage/storageAccounts",
+				"location": "[parameters('location')]",
+				"kind": "Storage",
+				"sku": {
+					"name": "Standard_LRS"
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').web.serverfarms]",
+				"name": "[variables('hostingPlanName')]",
+				"type": "Microsoft.Web/serverfarms",
+				"location": "[parameters('location')]",
+				"properties": {
+					"name": "[variables('hostingPlanName')]",
+					"computeMode": "Dynamic",
+					"sku": "Dynamic"
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').web.sites]",
+				"type": "Microsoft.Web/sites",
+				"name": "[variables('functionAppName')]",
+				"location": "[parameters('location')]",
+				"kind": "functionapp",            
+				"dependsOn": [
+					"[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+					"[resourceId('Microsoft.Storage/storageAccounts', variables('functionStorageAccountName'))]"
+				],
+				"properties": {
+					"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+					"siteConfig": {
+						"appSettings": [
+							{
+								"name": "AzureWebJobsDashboard",
+								"value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('functionStorageAccountName'), ';AccountKey=', listKeys(variables('functionStorageAccountid'),'2015-05-01-preview').key1)]"
+							},
+							{
+								"name": "AzureWebJobsStorage",
+								"value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('functionStorageAccountName'), ';AccountKey=', listKeys(variables('functionStorageAccountid'),'2015-05-01-preview').key1)]"
+							},
+							{
+								"name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+								"value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('functionStorageAccountName'), ';AccountKey=', listKeys(variables('functionStorageAccountid'),'2015-05-01-preview').key1)]"
+							},
+							{
+								"name": "WEBSITE_CONTENTSHARE",
+								"value": "[toLower(variables('functionAppName'))]"
+							},
+							{
+								"name": "FUNCTIONS_EXTENSION_VERSION",
+								"value": "~1"
+							},
+							{
+								"name": "WEBSITE_NODE_DEFAULT_VERSION",
+								"value": "6.5.0"
+							}
+						]
+					}
+				}          
+			},
 			{
 				"apiVersion": "[variables('apiVersions').recoveryServices.vaults]",
 				"type": "Microsoft.RecoveryServices/vaults",
