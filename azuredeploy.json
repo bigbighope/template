@@ -567,6 +567,13 @@
 					"Cool",
 					"Hot"
 				]
+			},
+			"alertEmailAddresses": {
+				"type": "string",
+				"defaultValue": "wende.kong@teradata.com",
+				"metadata": {
+					"description": "Comma-delimited email addresses where the alerts are also sent"
+				}
 			}
 		},
 		"variables": {
@@ -597,6 +604,11 @@
 					"availabilitySets": "2016-03-30",
 					"virtualMachines": "2016-03-30",
 					"virtualMachineExtensions": "2016-03-30"
+				},
+				"insights": {
+					"alertRules": "2016-03-01",
+					"actionGroups": "2017-04-01",
+					"activityLogAlerts": "2017-04-01"
 				}
 			},
 			"baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
@@ -813,6 +825,117 @@
 			"functionStorageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('functionStorageAccountName'))]"
 		},
 		"resources": [
+			{
+				"apiVersion": "[variables('apiVersions').insights.alertRules]",
+				"name": "[concat('highCPUAlert-', variables('vm'), copyIndex())]",
+				"type": "Microsoft.Insights/alertRules",
+				"dependsOn": [
+					"[variables('database')]"
+				],
+				"location": "[parameters('location')]",
+				"copy": {
+					"name": "alertRulesCopy",
+					"count": "[parameters('vmCountDatabase')]"
+				},
+				"properties": {
+					"name": "highCPUOnDatabaseVm",
+					"description": "CPU Usage in past 10 minutes was over threshold.",
+					"isEnabled": true,
+					"condition": {
+						"odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+						"dataSource": {
+							"odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+							"resourceUri": "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('vm'), copyIndex()))]",
+							"metricNamespace": null,
+							"metricName": "Percentage CPU"
+						},
+						"operator": "GreaterThan",
+						"threshold": 75,
+						"windowSize": "PT10M"
+					},
+					"actions": [
+						{
+							"odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+							"sendToServiceOwners": false,
+							"customEmails": "[split(parameters('alertEmailAddresses'), ',')]"
+						}
+					]
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').insights.alertRules]",
+				"name": "[concat('highCPUAlert-', 'dsc-vm', copyIndex())]",
+				"type": "Microsoft.Insights/alertRules",
+				"dependsOn": [
+					"[variables('dsu')]"
+				],
+				"location": "[parameters('location')]",
+				"copy": {
+					"name": "alertRulesCopy",
+					"count": "[variables('dsuNodeCount')]"
+				},
+				"properties": {
+					"name": "highCPUOnDsu",
+					"description": "CPU Usage in past 10 minutes was over threshold.",
+					"isEnabled": true,
+					"condition": {
+						"odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+						"dataSource": {
+							"odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+							"resourceUri": "[resourceId(subscription().subscriptionId, parameters('vnetResourceGroup'),'Microsoft.Compute/virtualMachines', concat(parameters('dsuSystemPrefix'), '-vm', copyIndex()))]",
+							"metricName": "Percentage CPU"
+						},
+						"operator": "GreaterThan",
+						"threshold": 75,
+						"windowSize": "PT10M",
+						"timeAggregation": "Average"
+					},
+					"actions": [
+						{
+							"odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+							"sendToServiceOwners": false,
+							"customEmails": "[split(parameters('alertEmailAddresses'), ',')]"
+						}
+					]
+				}
+			},
+			{
+				"apiVersion": "[variables('apiVersions').insights.alertRules]",
+				"name": "[concat('highCPUAlert-', 'viewpoint-vm', copyIndex())]",
+				"type": "Microsoft.Insights/alertRules",
+				"dependsOn": [
+					"[variables('viewpoint')]"
+				],
+				"location": "[parameters('location')]",
+				"copy": {
+					"name": "alertRulesCopy",
+					"count": "[variables('vpNodeCount')]"
+				},
+				"properties": {
+					"name": "highCPUOnViewpoint",
+					"description": "CPU Usage in past 10 minutes was over threshold.",
+					"isEnabled": true,
+					"condition": {
+						"odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+						"dataSource": {
+							"odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+							"resourceUri": "[resourceId(subscription().subscriptionId, parameters('vnetResourceGroup'),'Microsoft.Compute/virtualMachines', concat(parameters('vpSystemNamePrefix'), '-vm', copyIndex()))]",
+							"metricName": "Percentage CPU"
+						},
+						"operator": "GreaterThan",
+						"threshold": 75,
+						"windowSize": "PT10M",
+						"timeAggregation": "Average"
+					},
+					"actions": [
+						{
+							"odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+							"sendToServiceOwners": false,
+							"customEmails": "[split(parameters('alertEmailAddresses'), ',')]"
+						}
+					]
+				}
+			},
 			{
 				"apiVersion": "[variables('apiVersions').storage.storageAccounts]",
 				"name": "[variables('functionStorageAccountName')]",
